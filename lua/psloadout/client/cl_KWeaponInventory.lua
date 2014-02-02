@@ -50,7 +50,8 @@ function PANEL:setSelectionType( slotType, slotCategory )
 		for cat, items in pairs( attachments ) do
 			for k, attachment in pairs( items ) do
 				--Ownership
-				if not LoadoutView:getInstance( ).ownedItems[attachment.ID] then
+				if not LoadoutView:getInstance( ).ownedItems[attachment.ID] 
+				   or LoadoutView:getInstance( ).ownedItems[attachment.ID]:isExpired( ) then
 					continue
 				end
 				
@@ -62,16 +63,8 @@ function PANEL:setSelectionType( slotType, slotCategory )
 				--Compatible with other chosen attachents?
 				local incompatible = false
 				for slotId, attachmentOnWeapon in pairs( attachmentsOnWeapon ) do
-					if slot == self.slotId then
-						continue
-					end
-					local cstmAttachmentTable = CWAttachments[attachmentOnWeapon.ID]
-					if table.HasValue( cstmAttachmentTable.incompatibility, attachment.ID ) then
-						incompatible = true
-					end
-					
 					if attachmentOnWeapon.ID == attachment.ID then
-						return false --Dont allow it twice
+						continue --Dont allow it twice
 					end
 				end
 				if incompatible then

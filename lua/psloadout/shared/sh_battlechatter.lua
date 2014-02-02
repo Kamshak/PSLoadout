@@ -1,3 +1,6 @@
+if not PSLoadout.Config.calladutymode then 
+	return
+end
 if SERVER then
 	util.AddNetworkString( "PlaySound" )
 	util.AddNetworkString( "StreamSound" )

@@ -72,48 +72,61 @@ function EquippedLoadout:postLoad( )
 	return def:Promise( )
 end
 
-function EquippedLoadout:removeExpired( ply )
+function EquippedLoadout:removeExpired( )
 	local def = Deferred( )
 	
-	local plyId = ply.kPlayerId
+	local plyId = self.owner_id
+	local ply
+	for k, v in pairs( player.GetAll( ) ) do
+		if tonumber( v.kPlayerId ) == tonumber( plyId ) then
+			ply = v
+		end
+	end
+	
+	self:loadItems( )
+	
+	--Get all owned items instances
 	return LoadoutItem.findAllByOwner_id( plyId )
 	:Then( function( ownedItems ) 
+		--Lookup List for owned Items
 		local ownedItemsAssoc = {}
 		for _, v in pairs( ownedItems ) do
 			ownedItemsAssoc[v.itemclass] = v
 		end
 		
+		--Check loadout for expired items
 		local updated = false
-		for slotType, category in pairs( self ) do
-			if table.HasValue( EquippedLoadout.slotTypes, slotType ) then
-				if weapon then
-					local weaponId = category.weapon.ID
-					--Clear deleted/sold/expired weapon
-					if not ownedItemsAssoc[weapon] or ( ownedItemsAssoc[weaponId] and ownedItemsAssoc[weaponId]:isExpired( ) ) then
-						KLogf( 4, "%s: removed weapon %s, expired or removed", ply:Nick( ), category.weapon.Name )
-						category.weapon = nil
-						updated = true
-					end
+		for k, slotType in pairs( EquippedLoadout.slotTypes ) do
+			local category = self[slotType]
+			
+			local weaponId = category.weapon and category.weapon.ID
+			if weaponId and weaponId != ""  then
+				local weapon = ownedItemsAssoc[weaponId]
+				--Clear deleted/sold/expired weapon
+				if not ownedItemsAssoc[weaponId] or ( ownedItemsAssoc[weaponId] and ownedItemsAssoc[weaponId]:isExpired( ) ) then
+					KLogf( 4, "%s: removed weapon %s, expired or removed", ply:Nick( ), weaponId )
+					category.weapon = nil
+					updated = true
+				end
+			end
+			
+			for slotId, attachment in pairs( category.attachments or {} ) do
+				if not attachment then continue end
+				
+				--remove delete/sold/expired attachments
+				if not ownedItemsAssoc[attachment.ID] or ( ownedItemsAssoc[attachment.ID] and ownedItemsAssoc[attachmentId]:isExpired( ) ) then
+					category.attachments[slotId] = nil
+					updated = true
+					KLogf( 4, "%s: removed attachment %s, expired or removed", ply:Nick( ), attachment.ID )
+					continue
 				end
 				
-				for slotId, attachment in pairs( category.attachments or {} ) do
-					if not attachment then continue end
-					
-					--remove delete/sold/expired attachments
-					if not ownedItemsAssoc[attachment.ID] or ( ownedItemsAssoc[attachment.ID] and ownedItemsAssoc[attachment.ID]:isExpired( ) ) then
-						category.attachments[slotId] = nil
-						updated = true
-						KLogf( 4, "%s: removed attachment %s, expired or removed", ply:Nick( ), attachment.Name )
-						continue
-					end
-					
-					--Remove attachments from slots that player doesnt have access to anymore
-					local slot = PSLoadout.getSlot( slotId )
-					if slot.Ranks and not table.HasValue( slot.Ranks, ply:PS_GetUsergroup( ) ) then
-						KLogf( 4, "%s: removed attachment %s, insufficient privileges", ply:Nick( ), attachment.Name )
-						category.attachments[slotId] = nil
-						updated = true
-					end
+				--Remove attachments from slots that player doesnt have access to anymore
+				local slot = PSLoadout.getSlot( slotId )
+				if slot.Ranks and not table.HasValue( slot.Ranks, ply:PS_GetUsergroup( ) ) then
+					KLogf( 4, "%s: removed attachment %s, insufficient privileges", ply:Nick( ), attachment.Name )
+					category.attachments[slotId] = nil
+					updated = true
 				end
 			end
 		end

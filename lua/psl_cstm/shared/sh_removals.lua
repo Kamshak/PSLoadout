@@ -1,0 +1,11 @@
+--block cstm stuff
+hook.Add( "Think", "RemoveCstmBind", function( )
+	hook.Remove( "PlayerBindPress", "SWEP.PlayerBindPress (CSTM)" )
+	concommand.Remove( "cstm_requestpimp" )
+	concommand.Remove( "cstm_pimpmygun" )
+	concommand.Remove( "cstm_unpimpmygun" )
+	concommand.Remove( "cstm_addswag" )
+	concommand.Remove( "cstm_removeswag" )
+	concommand.Remove( "cstm_selectammo" )
+	concommand.Remove( "cstm_deselectammo" )
+end )

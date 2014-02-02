@@ -215,9 +215,9 @@ function PANEL:changeButtonClicked( )
 		--Open inv select
 		local changePanel = vgui.Create( "KWeaponInventory" )
 		if self.slotInfo.itemType == "slot" then
-			changePanel:setSelectionType( self.slotInfo.itemType, self.slotInfo.ShortName ) --disgusting
+			changePanel:setSelectionType( self.slotInfo.itemType, self.slotInfo.ShortName ) 
 		else
-			changePanel:setSelectionType( self.slotInfo.itemType, self.slotInfo.parentSlotType ) --disgusting
+			changePanel:setSelectionType( self.slotInfo.itemType, self.slotInfo.parentSlotType ) 
 		end
 		changePanel:setSlotId( self.slotInfo.ID )
 		changePanel:SetSize( 500, 400 )

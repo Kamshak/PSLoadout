@@ -49,16 +49,22 @@ function LoadoutItem.static.getOwnedAndValid( ply )
 end
 
 function LoadoutItem.static.clearExpiredItems( ply )
+	--sqlite support
 	local now = "NOW( )"
+	local permanent = "1970-01-01 00:00:00"
+	
+	--MySQL support
 	if not DATABASES[LoadoutItem.DB].CONNECTED_TO_MYSQL then
 		now = "'now'"
+		permanent = "0000-00-00 00:00:00"
 	end
 	return DATABASES[LoadoutItem.DB].DoQuery( Format( [[
 		DELETE FROM %s 
-		WHERE ( expirationTime != "0000-00-00 00:00:00" AND expirationTime < %s ) 
-		AND owner_id = "%i"]],
+		WHERE ( expirationTime != "%s" AND expirationTime < %s ) 
+		AND owner_id = "%i" AND 0]],
 		LoadoutItem.model.tableName,
-		now, --sqlite support
+		permanent,
+		now,
 		ply.kPlayerId ) )
 end
 

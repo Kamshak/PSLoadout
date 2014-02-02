@@ -31,9 +31,9 @@ CATEGORY.LoadoutSettings.Primary = {
 			ID = "PrimaryWeaponAttach3",
 			Name = "Attachment Slot 3",
 			ShortName = "Attachment",
-			Description = "T-VIP+ Only",
+			Description = "VIP Only",
 			Price = 80000,
-			Ranks = { "vip", "t-vip", "m-vip" }
+			Ranks = { "vip" }
 		}
 	}
 }
@@ -56,17 +56,17 @@ CATEGORY.LoadoutSettings.Secondary = {
 			ID = "SecondaryWeaponAttach2",
 			Name = "Attachment Slot 2",
 			ShortName = "Attachment",
-			Description = "T-VIP+ Only",
+			Description = "VIP Only",
 			Price = 20000,
-			Ranks = { "t-vip", "m-vip" }
+			Ranks = { "vip" }
 		},
 		[3] = {
 			ID = "SecondaryWeaponAttach3",
 			Name = "Attachment Slot 3",
 			ShortName = "Attachment",
-			Description = "M-VIP Only",
+			Description = "VIP Only",
 			Price = 70000,
-			Ranks = { "vip", "t-vip", "m-vip" }
+			Ranks = { "vip" }
 		},
 	}
 }
@@ -78,4 +78,23 @@ function MakePriceTable( basePrice )
 		[30] = basePrice * 5 * 3,
 		[0] = basePrice * 5 * 3 * 2
 	}
+end
+
+function FindWorldModel( class )
+	for k, v in pairs( weapons.GetList( ) ) do
+		if v.ClassName == class then
+			return v.WM or v.WorldModel
+		end
+	end
+end
+
+function FindPrintName( class )
+	if CLIENT then
+		for k, v in pairs( weapons.GetList( ) ) do
+			if v.ClassName == class then
+				return v.PrintName
+			end
+		end
+	end
+	return class
 end

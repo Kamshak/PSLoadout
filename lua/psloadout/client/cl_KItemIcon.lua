@@ -93,13 +93,8 @@ function PANEL:SetInvItem( invItem )
 	if not IsValid( self.ownedLabel ) and not self.hideOwned then
 		self.ownedLabel = vgui.Create( "DLabel", self.modelPanel )
 		self.ownedLabel:Dock( BOTTOM )
-		if invItem.expirationTime == 0 then
-			self.ownedLabel:SetColor( Color( 0, 255, 0 ) )
-		elseif invItem.expirationTime > os.time( ) then
-			self.ownedLabel:SetColor( Color( 20, 200, 0 ) )
-		end
+		
 		self.ownedLabel:SetContentAlignment( 5 )
-		self.ownedLabel:SetText( "Owned" )
 		self.ownedLabel:SetFont( "PS_Heading3" )
 		function self.ownedLabel:Paint( w, h )
 			derma.SkinHook( "Paint", "ItemOwnedBackground", self, w, h )
@@ -108,6 +103,13 @@ function PANEL:SetInvItem( invItem )
 			if invItem:isExpired( ) then
 				self:SetText( "Expired" )
 				self:SetColor( Color( 200, 0, 0 ) )
+			else
+				if invItem.expirationTime == 0 then
+					self:SetColor( Color( 0, 255, 0 ) )
+				elseif invItem.expirationTime > os.time( ) then
+					self:SetColor( Color( 20, 200, 0 ) )
+				end
+				self:SetText( "Owned" )
 			end
 		end
 	end

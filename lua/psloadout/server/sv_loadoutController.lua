@@ -87,10 +87,10 @@ function LoadoutController:equipLoadout( ply, slotId, itemId )
 	end )
 	:Then( function( loadoutTable )
 		--Apply loadout changes
-		
 		local slotType
 		if slot.itemType == "slot" then
 			slotType = slot.slotType
+			
 			--Set new loadout
 			loadoutTable[slot.slotType].weapon = itemId
 
@@ -99,22 +99,9 @@ function LoadoutController:equipLoadout( ply, slotId, itemId )
 		
 		if slot.itemType == "attachmentSlot" then
 			slotType = slot.parentSlotType
+			
 			--Set new attachment
 			loadoutTable[slot.parentSlotType].attachments[slotId] = itemId
-			
-			--Dont allow for incompatible attachments(2x scope etc)
-			--Am I incompatible with any previous attachments?
-			local attachments = loadoutTable[slot.parentSlotType].attachments
-			for _slot, attachmentId2 in pairs( attachments ) do
-				if attachmentId2 == self then
-					return
-				end
-				local cstmAttachmentTable = CWAttachments[attachmentId2]
-				if table.HasValue( cstmAttachmentTable.incompability or {}, itemId ) then
-					print( itemId, "Incompat", attachmentId2 )
-					attachments[_slot] = nil --Yes, remove other from list
-				end
-			end
 			
 			KLogf( 4, "Player %s equiped %s in slot %s", ply:Nick( ), ITEM.Name, slotId )
 		end
@@ -126,19 +113,19 @@ function LoadoutController:equipLoadout( ply, slotId, itemId )
 		
 		local attachmentsHandled = {}
 		for slot, attachmentId in pairs( attachments ) do
+			--Check for custom attachment assignments in the item file
 			if not PSLoadout.attachmentValidForWeapon( attachmentId, weapon ) then
 				attachments[slot] = nil
 				continue
 			end
 			
-			--Attachment check again to be sure
+			--Remove attachments incompatible with the selected
 			for _slot, attachmentId2 in pairs( attachments ) do
-				if attachmentId2 == self then
-					return
+				if attachmentId2 == attachmentId then
+					continue
 				end
-				local cstmAttachmentTable = CWAttachments[attachmentId2]
-				if table.HasValue( cstmAttachmentTable.incompability or {}, attachmentId ) then
-					print( attachmentId, "Incompat", attachmentId2 )
+				if not PSLoadout:getProvider( ):isAttachmentCompatible( weapon, attachmentId, attachmentId2 ) then
+					dp( attachmentId, "incompat", attachmentId2 )
 					attachments[_slot] = nil --Yes, remove other from list
 				end
 			end
@@ -348,7 +335,7 @@ end )
 
 function LoadoutController:playerSpawn( ply )
 	if not ply.kPlayerId then
-		--Try again when he is 
+		--Try again when it exists
 		hook.Add( "LibK_PlayerInitialSpawn", "LoadoutInitial" .. ply:Nick( ), function( )
 			hook.Remove( "LibK_PlayerInitialSpawn", "LoadoutInitial" .. ply:Nick( ) )
 			LoadoutController:playerSpawn( ply )
@@ -401,10 +388,12 @@ function LoadoutController:playerSpawn( ply )
 					continue
 				end
 				
-				timer.Simple( 2, function( )
+				timer.Simple( 0.5, function( )
 					for slot, attachment in pairs( category.attachments ) do
-						timer.Simple( 1, function( )
-							weapon:K_AddAttachment( attachment.cstmAttachmentNum )
+						timer.Simple( 0.5, function( )
+							if IsValid( weapon) then
+								PSLoadout:getProvider( ):addAttachmentToWeapon( weapon, attachment )
+							end
 						end )
 						KLogf( 4, "[Loadout] Attachment %s added to %s", attachment.Name, weaponItem.Name )
 					end
@@ -414,24 +403,7 @@ function LoadoutController:playerSpawn( ply )
 	end, function( errid, err )
 		KLogf( 3, "Error loading loadout for %s(%i), code %i error was %s", ply:Nick( ), ply.kPlayerId, errid, err )
 	end )
-	
-	--block:
-	--cstm_requestpimp
-	
-	--DTInt 1 == scoped
-	--dtint 19 == in cstm menu
 end
 hook.Add( "PlayerSpawn", "GivePlayerLoadout", function( ply )
 	LoadoutController:getInstance( ):playerSpawn( ply )
 end, -1 )
-
-hook.Add( "Think", "RemoveCstmBind", function( )
-	hook.Remove( "PlayerBindPress", "SWEP.PlayerBindPress (CSTM)" )
-	concommand.Remove( "cstm_requestpimp" )
-	concommand.Remove( "cstm_pimpmygun" )
-	concommand.Remove( "cstm_unpimpmygun" )
-	concommand.Remove( "cstm_addswag" )
-	concommand.Remove( "cstm_removeswag" )
-	concommand.Remove( "cstm_selectammo" )
-	concommand.Remove( "cstm_deselectammo" )
-end )

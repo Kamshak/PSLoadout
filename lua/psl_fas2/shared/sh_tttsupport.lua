@@ -12,7 +12,6 @@ hook.Add( "InitPostEntity", "fas2builtammo", function( )
 			end
 		end
 		if not found then
-			--print( "Not adding " .. ammoType.name )
 			continue 
 		end
 		
@@ -57,7 +56,7 @@ local function initializeWeapons( )
 			end
 			
 			local storedTbl = weapons.GetStored( v.ClassName )
-			if not ( weaponItem and weaponItem.NoAutoSpawn ) then
+			if not ( weaponItem and weaponItem.NoAutoSpawn ) and not table.HasValue( PS.Config.WeaponBlacklist, v.ClassName ) then
 				storedTbl.AutoSpawnable = true
 			end
 			

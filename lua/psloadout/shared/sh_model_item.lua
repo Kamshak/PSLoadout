@@ -75,12 +75,11 @@ function LoadoutItem:getTimeLeftString( )
 		return "0s"
 	end
 	
-	local diffTbl = os.date( "*t", timeleft )
-	--need to do this because of epoch start
-	diffTbl.day = diffTbl.day - 1
-	diffTbl.year = diffTbl.year - 1970
-	diffTbl.month = diffTbl.month - 1
-	diffTbl.hour = diffTbl.hour - 1
+	local weeks		= math.floor( timeleft / 604800 )
+	local days		= math.floor( timeleft / 86400 - weeks * 7 )
+	local hours 	= math.floor( timeleft / 3600 - days * 24 - weeks * 168  )
+	local minutes	= math.floor( timeleft / 60 - hours * 60 - days * 1440 - weeks * 10080 )
+	local seconds	= math.floor( timeleft / 60 - hours * 60 - days * 1440 - weeks * 10080 - minutes * 60 )
 	
 	local function splural( num, str )
 		if num > 1 or num == 0 then
@@ -91,21 +90,19 @@ function LoadoutItem:getTimeLeftString( )
 	end
 	
 	if timeleft < 3600 then
-		return string.format( "%s", splural( diffTbl.min, "minute" ) )
+		return string.format( "%s", splural( minutes, "minute" ) )
 	elseif timeleft < 24 * 3600 then
 		return string.format( "%s, %s", 
-			splural( diffTbl.hour, "hour" ),
-			splural( diffTbl.min, "minute" ) )
+			splural( hours, "hour" ),
+			splural( minutes, "minute" ) ) .. timeleft
 	elseif timeleft < 7 * 24 * 3600 then
 		return string.format( "%s, %s", 
-			splural( diffTbl.day, "day" ),
-			splural( diffTbl.hour, "hour" ) )
+			splural( days, "day" ),
+			splural( hours, "hour" ) )
 	else
-		diffTbl.week = math.floor( diffTbl.day / 7 )
-		diffTbl.day = diffTbl.day % 7
 		return string.format( "%s, %s",
-			splural( diffTbl.week, "week" ),
-			splural( diffTbl.day, "day" ) )
+			splural( weeks, "week" ),
+			splural( days, "day" ) )
 	end
 		
 end

@@ -1,5 +1,7 @@
 concommand.Remove( "fas2_togglegunpimper" )
-hook.Remove( "PlayerBindPress", "SWEP.PlayerBindPress (FAS2)" )
+hook.Add( "Think", "removeshite", function( )
+	hook.Remove( "PlayerBindPress", "SWEP.PlayerBindPress (FAS2)" )
+end )
 
 RunConsoleCommand( "fas2_nohud", 1 )
 RunConsoleCommand( "fas2_customhud", 0 )

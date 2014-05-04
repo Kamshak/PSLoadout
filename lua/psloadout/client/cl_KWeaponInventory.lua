@@ -33,6 +33,9 @@ function PANEL:setSelectionType( slotType, slotCategory )
 		for cat, items in pairs( itemsSorted[slotCategory] ) do
 			for k, item in pairs( items ) do
 				if LoadoutView:getInstance( ).ownedItems[item.ID] then
+					if LoadoutView:getInstance( ).ownedItems[item.ID]:isExpired( ) then
+						continue
+					end
 					self.items[cat] = self.items[cat] or {}
 					table.insert( self.items[cat], item )
 				end
@@ -54,6 +57,7 @@ function PANEL:setSelectionType( slotType, slotCategory )
 				   or LoadoutView:getInstance( ).ownedItems[attachment.ID]:isExpired( ) then
 					continue
 				end
+				print( LoadoutView:getInstance( ).ownedItems[attachment.ID]:isExpired( ) )
 				
 				--Can put on weapon?
 				if not PSLoadout.attachmentValidForWeapon( attachment.ID, weapon ) then

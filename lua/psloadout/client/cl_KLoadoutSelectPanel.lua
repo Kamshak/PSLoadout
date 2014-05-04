@@ -2,7 +2,7 @@ local PANEL = {}
 
 function PANEL:Init( )
 	self:DockPadding( 5, 5, 5, 5 )
-	--self:SetWide( 500 )
+	self:SetWide( 500 )
 	--self:SetTall( 300 )
 	
 	self.heading = vgui.Create( "DLabel", self )
@@ -18,7 +18,7 @@ function PANEL:Init( )
 	function self.bottomPanel.PerformLayout( panel )
 		self.primariesPanel:PerformLayout( )
 		self.secondariesPanel:PerformLayout( )
-		panel:SizeToChildren( true, true )
+		panel:SizeToChildren( false, true )
 	end
 	self.bottomPanel.Paint = function( ) end
 	
@@ -41,8 +41,9 @@ function PANEL:PerformLayout( )
 	--local x, y = self.primariesPanel:GetPos( )
 	--self:SetTall( self.primariesPanel:GetTall( ) + y )
 	self.bottomPanel:SetTall( 1000 )
-	self.bottomPanel:PerformLayout( )
 	self.primariesPanel:SetWide( 500 )
+	self.secondariesPanel:SetWide( 500 )
+	self.bottomPanel:PerformLayout( )
 	self:SizeToChildren( false, true )
 end
 
@@ -60,9 +61,6 @@ function PANEL:Init( )
 		--surface.DrawRect( 0, 0, w, h )
 	end
 	function self.weaponPanel.PerformLayout( panel )
-		panel:SetWide( 1000 )
-		self.slotTitle:SizeToContents( )
-		panel:SetWide( self.slotTitle:GetWide( ) + 20 )
 		panel:SizeToChildren( false, true )
 	end
 	
@@ -104,7 +102,7 @@ function PANEL:Init( )
 	self.attachmentSlotLayout:SetSpaceX( 10 )
 	local op = self.attachmentSlotLayout.PerformLayout
 	function self.attachmentSlotLayout:PerformLayout( )
-		self:SetWide( self:GetParent( ):GetWide( ) )
+		self:SetWide( 460 )
 		op( self )
 		self:SizeToChildren( true, true )
 		

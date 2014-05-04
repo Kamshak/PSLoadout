@@ -13,7 +13,7 @@ Config.PreOwnedItems = {
 --Included is a skin for the default pointshop: DefaultLoadout
 --For Modern Pointshop Skin( http://coderhire.com/scripts/view/354 ) owners 
 --a matching skin is available as DLC(Skin Name: ModernPS).
-Config.DermaSkin = "ModernPS"
+Config.DermaSkin = "LoadoutClean"
 
 --Weapon provider to use.
 --Supported are CSTM for Customizable Weaponry 
